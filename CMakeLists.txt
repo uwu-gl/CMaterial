@@ -106,7 +106,7 @@ elseif((CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Cl
     endif()
 endif()
 
-if (CMAKE_BUILD_TYPE MATCHES "Release")
+if (CMAKE_BUILD_TYPE MATCHES "Release" AND NOT APPLE)
     add_custom_command(TARGET CMaterial POST_BUILD
             COMMAND upx --best --lzma $<TARGET_FILE:CMaterial>
             COMMENT "Running UPX to compress the release executable..."
