@@ -6,8 +6,15 @@
 
 #include "imgui.h"
 
-void cmaterial::component::BasicWindow::render(ImGuiIO *io, bool &is_open, ImGuiWindowFlags flags) {
-    if (ImGui::Begin("CMaterial Engine", &is_open, flags)) {
+void cmaterial::component::BasicWindow::render(ImGuiIO *io) {
+    if (!is_open) {
+        isDead = true;
+        return;
+    }
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse;
+
+    if (ImGui::Begin(name.c_str(), &is_open, flags)) {
         ImGui::Text("Hello, Engine!");
         ImGui::Text("Frame time: %.3f ms/frame (%.1f FPS)", 1000.0f / io->Framerate, io->Framerate);
 

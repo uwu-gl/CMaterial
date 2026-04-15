@@ -4,14 +4,28 @@
 
 #ifndef CMATERIAL_ICOMPONENT_H
 #define CMATERIAL_ICOMPONENT_H
+
+
+
 #include "imgui.h"
+
+#include <unordered_map>
+#include <string>
 
 
 namespace cmaterial::component {
     class IComponent {
     public:
         virtual ~IComponent() = default;
-        virtual void render(ImGuiIO *io, bool &is_open, ImGuiWindowFlags flags) = 0;
+        virtual void render(ImGuiIO *io) = 0;
+
+    //protected:
+        std::string name;
+        int xPercent = 0;
+        int yPercent = 0;
+        bool isActive = true;
+        bool isDead = false;
+        std::unordered_map<std::string, IComponent *> childComponents;
     };
 }
 

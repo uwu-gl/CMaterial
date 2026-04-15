@@ -4,8 +4,8 @@
 
 #include "Framework.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/gl.h>
+#include <GLFW/glfw3.h>
 
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -18,7 +18,6 @@ cmaterial::Framework::Framework() {
 
     io = nullptr;
     hidden_window = nullptr;
-    is_open = true;
 }
 
 cmaterial::Framework::error cmaterial::Framework::initialize() {
@@ -63,19 +62,27 @@ cmaterial::Framework::error cmaterial::Framework::run() {
     if (!initialized)
         return NOT_INIT;
 
-    while (!glfwWindowShouldClose(hidden_window) && is_open) {
+    while (!glfwWindowShouldClose(hidden_window) && !components.empty()) {
         glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGuiWindowFlags flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse;
+        for (std::pair<std::string, component::IComponent *> pair : components) {
+            if (pair.second->isDead) {
+                deadComponentNames.push_back(pair.first);
+                continue;
+            }
 
-        // --- ONLY FOR TEST ---
-        cmaterial::component::BasicWindow basicWindow;
-        basicWindow.render(io, is_open, flags);
-        // ---------------------
+            pair.second->render(io);
+        }
+
+        for (std::string deadComponentName : deadComponentNames) {
+            components.erase(deadComponentName);
+        }
+
+        deadComponentNames.clear();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -91,6 +98,16 @@ cmaterial::Framework::error cmaterial::Framework::run() {
     }
 
     return OK;
+}
+
+void cmaterial::Framework::addComponent(component::IComponent *component) {
+    if (component == nullptr)
+        return;
+
+    if (component->name.empty())
+        return;
+
+    components.insert({component->name, component});
 }
 
 cmaterial::Framework::~Framework() {

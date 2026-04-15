@@ -5,9 +5,13 @@
 #ifndef CMATERIAL_FRAMEWORK_H
 #define CMATERIAL_FRAMEWORK_H
 
-#include "imgui.h"
+
+
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include "imgui.h"
+
+#include "engine/component/IComponent.h"
 
 namespace cmaterial {
     class Framework {
@@ -25,6 +29,8 @@ namespace cmaterial {
         error initialize();
         error run();
 
+        void addComponent(component::IComponent *component);
+
         ~Framework();
 
     private:
@@ -32,7 +38,8 @@ namespace cmaterial {
 
         ImGuiIO *io;
         GLFWwindow *hidden_window;
-        bool is_open;
+        std::unordered_map<std::string, component::IComponent *> components;
+        std::vector<std::string> deadComponentNames;
     };
 }
 

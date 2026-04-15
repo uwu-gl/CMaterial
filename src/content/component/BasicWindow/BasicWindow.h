@@ -14,7 +14,10 @@ namespace cmaterial::component{
         BasicWindow() = default;
         ~BasicWindow() = default;
 
-        void render(ImGuiIO *io, bool &is_open, ImGuiWindowFlags flags) override;
+        void render(ImGuiIO *io) override;
+
+    private:
+        bool is_open = true;
     };
 }
 
