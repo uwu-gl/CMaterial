@@ -1,3 +1,7 @@
+#
+# Created by Earth_Studio on 2026/4/12.
+#
+
 cmake_minimum_required(VERSION 4.1)
 project(CMaterial LANGUAGES C CXX)
 
@@ -10,23 +14,44 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
+set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
+
 add_subdirectory(submodule/glfw)
 add_subdirectory(submodule/tweeny)
 add_subdirectory(thirdparty/upx)
 
+file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
+        "src/engine/*.cpp"
+        "src/engine/*.c"
+        "src/engine/*.h"
+        "src/engine/*.hpp"
+)
+
+file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
+        "src/content/*.cpp"
+        "src/content/*.c"
+        "src/content/*.h"
+        "src/content/*.hpp"
+)
+
 add_executable(CMaterial
         src/main.cpp
+        src/main.h
         src/gl.c
         include/imgui/imgui.cpp
         include/imgui/imgui_draw.cpp
         include/imgui/imgui_tables.cpp
         include/imgui/imgui_widgets.cpp
-        include/imgui/imgui_demo.cpp
         include/imgui/backends/imgui_impl_glfw.cpp
         include/imgui/backends/imgui_impl_opengl3.cpp
+
+        ${ENGINE_SOURCES}
+        ${APP_SOURCES}
 )
 
 target_include_directories(CMaterial PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include/imgui
 )
@@ -37,6 +62,41 @@ target_link_libraries(CMaterial PRIVATE
         glfw
         tweeny
 )
+
+if(MSVC AND CMAKE_BUILD_TYPE MATCHES "Release")
+    target_compile_options(CMaterial PRIVATE
+            /O1
+            /Os
+            /Gy
+            /Gw
+            /GR-
+            /GS-
+            # /EHs-c-
+    )
+
+    target_link_options(CMaterial PRIVATE
+            /OPT:REF
+            /OPT:ICF
+            /LTCG
+
+            /SUBSYSTEM:WINDOWS
+            /ENTRY:mainCRTStartup
+    )
+
+elseif((CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang") AND CMAKE_BUILD_TYPE MATCHES "Release")
+    target_compile_options(CMaterial PRIVATE
+            -O3
+            -ffunction-sections
+            -fdata-sections
+            -fno-rtti
+            -fno-strict-aliasing
+    )
+
+    target_link_options(CMaterial PRIVATE
+            "-Wl,--gc-sections"
+            "-s"
+    )
+endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Release")
     add_custom_command(TARGET CMaterial POST_BUILD
