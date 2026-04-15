@@ -25,9 +25,11 @@ jobs:
           - os: macos-latest
             artifact_name: CMaterial-macOS
             executable: build/CMaterial
-          - os: macos-13
+            cmake_flags: "-DCMAKE_OSX_ARCHITECTURES=arm64"
+          - os: macos-latest
             artifact_name: CMaterial-macOS-x86_64
             executable: build/CMaterial
+            cmake_flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64"
 
     steps:
     - name: Checkout repository and submodules
