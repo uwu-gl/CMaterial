@@ -17,8 +17,14 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
 
+set(MI_OVERRIDE ON CACHE BOOL "" FORCE)
+set(MI_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(MI_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(MI_BUILD_OBJECT OFF CACHE BOOL "" FORCE)
+
 add_subdirectory(submodule/glfw)
 add_subdirectory(submodule/tweeny)
+add_subdirectory(submodule/mimalloc)
 
 if (NOT APPLE AND CMAKE_BUILD_TYPE MATCHES "Release")
     add_subdirectory(thirdparty/upx)
@@ -51,14 +57,14 @@ add_executable(CMaterial
 
         ${ENGINE_SOURCES}
         ${APP_SOURCES}
-        src/content/component/BasicButton/BasicButton.cpp
-        src/content/component/BasicButton/BasicButton.h
+        src/content/component/CreatorButton/CreatorButton.h
 )
 
 target_include_directories(CMaterial PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include/imgui
+        ${CMAKE_CURRENT_SOURCE_DIR}/submodule/mimalloc/include
 )
 
 find_package(OpenGL REQUIRED)
@@ -66,6 +72,7 @@ target_link_libraries(CMaterial PRIVATE
         OpenGL::GL
         glfw
         tweeny
+        mimalloc-static
 )
 
 if(MSVC AND CMAKE_BUILD_TYPE MATCHES "Release")
@@ -87,6 +94,8 @@ if(MSVC AND CMAKE_BUILD_TYPE MATCHES "Release")
             /SUBSYSTEM:WINDOWS
             /ENTRY:mainCRTStartup
     )
+
+    set_target_properties(CMaterial PROPERTIES LINK_FLAGS "/INCLUDE:malloc")
 
 elseif((CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang") AND CMAKE_BUILD_TYPE MATCHES "Release")
     target_compile_options(CMaterial PRIVATE

@@ -37,6 +37,7 @@ Design your own components however you wish using OpenGL 3.3 Core and ImGui APIs
 - **[GLAD](https://github.com/dav1dde/glad)** : A multi-Language Vulkan/GL/GLES/EGL/GLX/WGL loader-generator based on the official specifications.
 - **[tweeny](https://github.com/mobius3/tweeny)** : An inbetweening library designed for the creation of complex animations and beautiful interactive software.
 - **[stb_image](https://github.com/nothings/stb)** : A highly renowned single-file public domain library for loading images in C/C++.
+- **[mimalloc](https://github.com/microsoft/mimalloc)** :  A compact general purpose allocator with excellent performance.
 
 ---
 

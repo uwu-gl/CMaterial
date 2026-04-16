@@ -17,107 +17,111 @@
 #include <unordered_map>
 #include <vector>
 
-cmaterial::Framework::Framework() {
-    initialized = false;
+#include <mimalloc-new-delete.h>
 
-    io = nullptr;
-    hidden_window = nullptr;
-}
+namespace cmaterial {
+    Framework::Framework() {
+        initialized = false;
 
-cmaterial::Framework::error cmaterial::Framework::initialize() {
-    if (!glfwInit())
-        return GLFW_INIT_FAILED;
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-
-    hidden_window = glfwCreateWindow(1, 1, "Hidden", nullptr, nullptr);
-    if (!hidden_window) {
-        glfwTerminate();
-        return GLFW_CREATE_WINDOW_FAILED;
+        io = nullptr;
+        hidden_window = nullptr;
     }
 
-    glfwMakeContextCurrent(hidden_window);
-    glfwSwapInterval(1);
+    Framework::error Framework::initialize() {
+        if (!glfwInit())
+            return GLFW_INIT_FAILED;
 
-    if (!gladLoadGL(glfwGetProcAddress))
-        return GLAD_LOAD_GL_FAILED;
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    io = &ImGui::GetIO();
-    io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    io->ConfigViewportsNoAutoMerge = true;
-    io->IniFilename = nullptr;
+        hidden_window = glfwCreateWindow(1, 1, "Hidden", nullptr, nullptr);
+        if (!hidden_window) {
+            glfwTerminate();
+            return GLFW_CREATE_WINDOW_FAILED;
+        }
 
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(hidden_window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+        glfwMakeContextCurrent(hidden_window);
+        glfwSwapInterval(1);
 
-    initialized = true;
+        if (!gladLoadGL(glfwGetProcAddress))
+            return GLAD_LOAD_GL_FAILED;
 
-    return OK;
-}
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        io = &ImGui::GetIO();
+        io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        io->ConfigViewportsNoAutoMerge = true;
+        io->IniFilename = nullptr;
 
-cmaterial::Framework::error cmaterial::Framework::run() {
-    if (!initialized)
-        return NOT_INIT;
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(hidden_window, true);
+        ImGui_ImplOpenGL3_Init("#version 330");
 
-    while (!glfwWindowShouldClose(hidden_window) && !components.empty()) {
-        glfwPollEvents();
+        initialized = true;
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        return OK;
+    }
 
-        for (std::pair<std::string, component::IComponent *> pair : components) {
-            if (pair.second->isDead) {
-                deadComponentNames.push_back(pair.first);
-                continue;
+    Framework::error Framework::run() {
+        if (!initialized)
+            return NOT_INIT;
+
+        while (!glfwWindowShouldClose(hidden_window) && !components.empty()) {
+            glfwPollEvents();
+
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            for (std::pair<std::string, component::IComponent *> pair: components) {
+                if (pair.second->isDead) {
+                    deadComponentNames.push_back(pair.first);
+                    continue;
+                }
+
+                pair.second->render(io);
             }
 
-            pair.second->render(io);
+            for (std::string deadComponentName: deadComponentNames) {
+                components.erase(deadComponentName);
+            }
+
+            deadComponentNames.clear();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+                GLFWwindow *backup_context = glfwGetCurrentContext();
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+                glfwMakeContextCurrent(backup_context);
+            }
+
+            glfwSwapBuffers(hidden_window);
         }
 
-        for (std::string deadComponentName : deadComponentNames) {
-            components.erase(deadComponentName);
-        }
-
-        deadComponentNames.clear();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            GLFWwindow *backup_context = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_context);
-        }
-
-        glfwSwapBuffers(hidden_window);
+        return OK;
     }
 
-    return OK;
-}
+    void Framework::addComponent(component::IComponent *component) {
+        if (component == nullptr)
+            return;
 
-void cmaterial::Framework::addComponent(component::IComponent *component) {
-    if (component == nullptr)
-        return;
+        if (component->name.empty())
+            return;
 
-    if (component->name.empty())
-        return;
+        components.insert({component->name, component});
+    }
 
-    components.insert({component->name, component});
-}
-
-cmaterial::Framework::~Framework() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-    glfwDestroyWindow(hidden_window);
-    glfwTerminate();
+    Framework::~Framework() {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        glfwDestroyWindow(hidden_window);
+        glfwTerminate();
+    }
 }

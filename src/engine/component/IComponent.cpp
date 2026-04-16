@@ -4,12 +4,14 @@
 
 #include "IComponent.h"
 
-void cmaterial::component::IComponent::addComponent(cmaterial::component::IComponent *component) {
-    if (component == nullptr)
-        return;
+namespace cmaterial::component {
+    void IComponent::addComponent(IComponent *component) {
+        if (component == nullptr)
+            return;
 
-    if (component->name.empty())
-        return;
+        if (component->name.empty())
+            return;
 
-    components.insert({component->name, component});
+        components.insert({component->name, component});
+    }
 }

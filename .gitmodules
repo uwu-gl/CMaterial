@@ -11,3 +11,6 @@
 [submodule "thirdparty/upx"]
 	path = thirdparty/upx
 	url = https://github.com/upx/upx.git
+[submodule "submodule/mimalloc"]
+	path = submodule/mimalloc
+	url = https://github.com/microsoft/mimalloc.git

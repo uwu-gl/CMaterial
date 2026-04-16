@@ -37,6 +37,7 @@
 - **[GLAD](https://github.com/dav1dde/glad)** : 基于官方规范的多语言 Vulkan/GL/GLES/EGL/GLX/WGL 加载器生成工具。
 - **[tweeny](https://github.com/mobius3/tweeny)** : 一个专为游戏和其他精美交互式软件打造的复杂补间动画库。
 - **[stb_image](https://github.com/nothings/stb)** : C/C++ 领域极具盛名的单头文件公共域图像加载库。
+- **[mimalloc](https://github.com/microsoft/mimalloc)** :  一款性能卓越、体积精简的通用内存分配器。
 
 ---
 
