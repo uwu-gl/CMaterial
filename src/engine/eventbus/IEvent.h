@@ -11,6 +11,8 @@ namespace cmaterial::event {
     class IEvent {
     public:
         virtual ~IEvent() = default;
+
+        typedef const void* EventID;
     };
 }
 

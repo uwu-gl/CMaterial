@@ -20,11 +20,14 @@ namespace cmaterial::component {
         virtual void render(ImGuiIO *io) = 0;
         virtual void addComponent(IComponent *component);
 
-    //protected:
+        bool getIsDead();
+
         std::string name;
         int xPercent = 0;
         int yPercent = 0;
         bool isActive = true;
+
+    protected:
         bool isDead = false;
         std::unordered_map<std::string, IComponent *> components;
     };

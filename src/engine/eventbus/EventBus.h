@@ -4,7 +4,10 @@
 
 #ifndef CMATERIAL_EVENTBUS_H
 #define CMATERIAL_EVENTBUS_H
-#include <vector>
+
+
+#include <string>
+#include <unordered_map>
 
 
 namespace cmaterial::event {
@@ -14,7 +17,7 @@ namespace cmaterial::event {
         ~EventBus();
 
     //private:
-        //static std::vector<void*> test;
+        static std::unordered_map<std::string, std::vector<int>> subscriberMap;
     };
 }
 

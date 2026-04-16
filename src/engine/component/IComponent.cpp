@@ -14,4 +14,8 @@ namespace cmaterial::component {
 
         components.insert({component->name, component});
     }
+
+    bool IComponent::getIsDead() {
+        return isDead;
+    }
 }

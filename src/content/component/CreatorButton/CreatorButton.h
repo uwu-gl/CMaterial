@@ -33,7 +33,7 @@ namespace cmaterial::component {
             }
 
             std::erase_if(spawnedWindows, [](const auto& win) {
-                return win->isDead;
+                return win->getIsDead();
             });
         }
     };

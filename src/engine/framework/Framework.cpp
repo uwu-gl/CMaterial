@@ -77,7 +77,7 @@ namespace cmaterial {
             ImGui::NewFrame();
 
             for (std::pair<std::string, component::IComponent *> pair: components) {
-                if (pair.second->isDead) {
+                if (pair.second->getIsDead()) {
                     deadComponentNames.push_back(pair.first);
                     continue;
                 }
@@ -85,7 +85,7 @@ namespace cmaterial {
                 pair.second->render(io);
             }
 
-            for (std::string deadComponentName: deadComponentNames) {
+            for (const std::string& deadComponentName: deadComponentNames) {
                 components.erase(deadComponentName);
             }
 
