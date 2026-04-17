@@ -19,7 +19,9 @@
 #include <unordered_map>
 #include <vector>
 
+#ifdef _WIN32
 #include <mimalloc-new-delete.h>
+#endif
 
 namespace cmaterial {
     Framework::Framework() {
