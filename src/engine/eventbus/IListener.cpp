@@ -7,7 +7,15 @@
 #include "EventBus.h"
 
 namespace cmaterial::event {
+    const std::vector<IHandler *> &IListener::getHandlers() const {
+        return handlers;
+    }
+
+    void IListener::_add_handler(IHandler *h) {
+        handlers.push_back(h);
+    }
+
     IListener::~IListener() {
-        //EventBus::subscriberMap.erase(listenEventName);
+        for (auto* h : handlers) delete h;
     }
 }

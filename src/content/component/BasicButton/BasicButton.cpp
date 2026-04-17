@@ -5,5 +5,6 @@
 #include "BasicButton.h"
 
 void cmaterial::component::BasicButton::render(ImGuiIO *io) {
-    ImGui::Button("BasicButton");
+    if (ImGui::Button(name.c_str()))
+        onActive();
 }

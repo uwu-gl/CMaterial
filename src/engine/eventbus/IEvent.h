@@ -6,16 +6,27 @@
 #define CMATERIAL_IEVENT_H
 
 
-
 namespace cmaterial::event {
     class IEvent {
     public:
         virtual ~IEvent() = default;
+        virtual const void* getEventType() const = 0;
 
-        typedef const void* EventID;
+        bool getIsCancelled();
+
+    protected:
+        bool isCancelled = false;
+
+#define REGISTEREVENT(T)                                                                                               \
+        static const void *getStaticType() {                                                                           \
+            static int dummy;                                                                                          \
+            return &dummy;                                                                                             \
+        }                                                                                                              \
+        const void *getEventType() const override {                                                                    \
+            return getStaticType();                                                                                    \
+        }
     };
 }
-
 
 
 

@@ -12,6 +12,7 @@
 #include "imgui.h"
 
 #include "engine/component/IComponent.h"
+#include "engine/eventbus/EventBus.h"
 
 #include <string>
 #include <unordered_map>
@@ -19,6 +20,7 @@
 
 namespace cmaterial {
     class Framework {
+    public:
         enum error {
             OK,
             NOT_INIT,
@@ -27,15 +29,16 @@ namespace cmaterial {
             GLAD_LOAD_GL_FAILED
         };
 
-    public:
         Framework();
+        ~Framework();
 
         error initialize();
         error run();
 
         void addComponent(component::IComponent *component);
+        void addListener(event::IListener *listener);
 
-        ~Framework();
+        event::EventBus* getEventBus();
 
     private:
         bool initialized;
@@ -44,6 +47,8 @@ namespace cmaterial {
         GLFWwindow *hidden_window;
         std::unordered_map<std::string, component::IComponent *> components;
         std::vector<std::string> deadComponentNames;
+
+        event::EventBus eventBus;
     };
 }
 

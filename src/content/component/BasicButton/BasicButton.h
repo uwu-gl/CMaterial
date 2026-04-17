@@ -16,6 +16,7 @@ namespace cmaterial::component {
         ~BasicButton() = default;
 
         void render(ImGuiIO *io) override;
+        void (*onActive)() =[]() {};
     };
 }
 

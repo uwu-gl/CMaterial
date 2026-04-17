@@ -6,20 +6,36 @@
 #define CMATERIAL_EVENTBUS_H
 
 
-#include <string>
+#include <vector>
 #include <unordered_map>
+#include <mutex>
+
+#include "IListener.h"
 
 
 namespace cmaterial::event {
+    class IListener;
+    class IHandler;
+    class IEvent;
+
     class EventBus {
     public:
         EventBus() = default;
         ~EventBus();
 
-    //private:
-        static std::unordered_map<std::string, std::vector<int>> subscriberMap;
+        void subscribe(IListener* listener);
+        void post(IEvent* event);
+        void dispatch();
+
+    private:
+        std::vector<IListener*> registeredListeners;
+        std::unordered_map<const void*, std::vector<IHandler*>> subscriberMap;
+
+        std::vector<IEvent*> eventQueue ;
+        std::mutex queueMutex;
     };
 }
+
 
 
 

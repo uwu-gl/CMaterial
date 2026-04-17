@@ -11,6 +11,8 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "imgui.h"
 
+#include "engine/eventbus/IListener.h"
+
 #include "content/component/BasicWindow/BasicWindow.h"
 
 #include <string>
@@ -72,6 +74,8 @@ namespace cmaterial {
         while (!glfwWindowShouldClose(hidden_window) && !components.empty()) {
             glfwPollEvents();
 
+            eventBus.dispatch();
+
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
@@ -115,6 +119,17 @@ namespace cmaterial {
             return;
 
         components.insert({component->name, component});
+    }
+
+    void Framework::addListener(event::IListener *listener) {
+        if (listener == nullptr)
+            return;
+
+        eventBus.subscribe(listener);
+    }
+
+    event::EventBus *Framework::getEventBus() {
+        return &eventBus;
     }
 
     Framework::~Framework() {

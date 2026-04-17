@@ -57,9 +57,6 @@ add_executable(CMaterial
 
         ${ENGINE_SOURCES}
         ${APP_SOURCES}
-        src/content/component/CreatorButton/CreatorButton.h
-        src/engine/eventbus/IListener.cpp
-        src/engine/eventbus/IListener.h
 )
 
 target_include_directories(CMaterial PRIVATE
