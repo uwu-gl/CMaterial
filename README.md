@@ -30,6 +30,9 @@ A meticulously built top-level architecture designed for modern GUI software dev
 ## Highly Customizable
 Design your own components however you wish using OpenGL 3.3 Core and ImGui APIs, then use them just like native ImGui widgets. It is ***stupidly easy and fast*** to build complex and beautiful UIs. Additionally, a visual UI editor is on the roadmap.
 
+## Hybrid Mode
+Neither Immediate Mode nor Retained Mode—but ***both***. CMaterial leverages Retained Mode at the **UI Layer** for the structural integrity of a mature framework, while empowering the **Component Layer** with Immediate Mode for unrestricted control over how every pixel is rendered.
+
 ---
 
 ## Libraries
